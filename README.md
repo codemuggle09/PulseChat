@@ -1,178 +1,195 @@
 # PulseChat
 
-A modern, scalable chat application built with Next.js, Express, Redis, and Apache Kafka. This application demonstrates real-time messaging capabilities with distributed system architecture.
+Real-time chat application built with Next.js and Express, using Apache Kafka for asynchronous message processing, Redis for session management and caching, and PostgreSQL for persistent storage.
 
-## ✨ Features
+## Architecture
 
-- 🔐 Secure authentication with Google OAuth
-- 💬 Real-time messaging using Socket.IO
-- 📡 Message queueing with Apache Kafka
-- 🔄 Redis for session management and caching
-- 🎯 TypeScript for type safety
-- 🎨 Modern UI with Tailwind CSS
-- 🔍 Message persistence with PostgreSQL
-- 🌐 Scalable architecture
-
-## 🏗️ Architecture
-
-```mermaid
-graph LR
-    Client[Next.js Client] --> API[Express API]
-    API --> Redis[Redis Cache]
-    API --> Kafka[Apache Kafka]
-    API --> DB[(PostgreSQL)]
-    Kafka --> Consumer[Kafka Consumer]
-    Consumer --> DB
+```text
+                    ┌────────────────┐
+                    │  Next.js Client│
+                    └───────┬────────┘
+                            │
+                            ▼
+                    ┌────────────────┐
+                    │  Express API   │
+                    └───────┬────────┘
+                            │
+              ┌─────────────┼─────────────┐
+              │             │             │
+              ▼             ▼             ▼
+         ┌─────────┐   ┌─────────┐   ┌────────────┐
+         │  Redis  │   │  Kafka  │   │ PostgreSQL │
+         │ Sessions│   │ Messages│   │ Persistence│
+         │  Cache  │   └────┬────┘   └────────────┘
+         └─────────┘        │
+                            ▼
+                     ┌──────────────┐
+                     │Kafka Consumer│
+                     └──────┬───────┘
+                            │
+                            ▼
+                     ┌────────────┐
+                     │ PostgreSQL │
+                     └────────────┘
 ```
 
-## 🛠️ Tech Stack
+## Features
+
+- Google OAuth authentication
+- Real-time messaging with Socket.IO
+- Asynchronous message processing with Apache Kafka
+- Redis-based session management and caching
+- PostgreSQL persistence through Prisma
+- Next.js frontend with TypeScript
+- Express.js backend
+- Tailwind CSS interface
+
+## Tech Stack
 
 ### Frontend
+
 - Next.js 14
+- React
 - TypeScript
 - Tailwind CSS
 - Socket.IO Client
-- Next-Auth
-- Radix UI Components
+- NextAuth
+- Radix UI
 
 ### Backend
+
+- Node.js
 - Express.js
-- Node-rdkafka
 - Socket.IO
-- Redis Streams
-- Prisma ORM
+- Node-rdkafka
+- Redis
+- Prisma
 - PostgreSQL
 
-## 📦 Prerequisites
+### Infrastructure
 
-- Node.js >= 18
-- Redis Server
 - Apache Kafka
-- PostgreSQL
-- Aiven Account (for Kafka service)
+- Redis
+- Docker
 
-## 🚀 Getting Started
+## Project Structure
 
-1. **Clone the repository**
-```bash
-git clone https://github.com/yourusername/pulsechat.git
-cd pulsechat
+```text
+PulseChat/
+├── client/
+│   ├── src/
+│   │   ├── app/
+│   │   ├── components/
+│   │   ├── lib/
+│   │   └── validations/
+│   └── public/
+│
+├── server/
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── middleware/
+│   │   └── routes/
+│   └── prisma/
+│
+└── docker/
 ```
 
-2. **Install dependencies**
+## Setup
+
+### Prerequisites
+
+- Node.js 18+
+- pnpm
+- PostgreSQL
+- Redis
+- Apache Kafka
+
+### Clone the Repository
+
 ```bash
-# Install server dependencies
+git clone https://github.com/codemuggle09/PulseChat.git
+cd PulseChat
+```
+
+### Install Dependencies
+
+Install server dependencies:
+
+```bash
 cd server
 pnpm install
+```
 
-# Install client dependencies
+Install client dependencies:
+
+```bash
 cd ../client
 pnpm install
 ```
 
-3. **Configure Environment Variables**
+### Environment Variables
 
-Server (.env):
-```env
-PORT=8000
-CLIENT_APP_URL=http://localhost:3001
-APP_URL=http://localhost:8000
-JWT_SECRET=your_jwt_secret
+Create the following files:
 
-# Database
-DATABASE_URL=your_postgresql_url
-
-# Kafka Configuration
-KAFKA_BROKER=your_kafka_broker
-KAFKA_USERNAME=your_username
-KAFKA_PASSWORD=your_password
-KAFKA_TOPIC=chats
-KAFKA_SSL_ENABLED=true
-
-# Redis Configuration
-REDIS_HOST=localhost
-REDIS_PORT=6379
+```text
+server/.env
+client/.env.local
 ```
 
-Client (.env.local):
-```env
-NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-```
+Configure the required database, Kafka, Redis, backend, and Google OAuth credentials according to your environment.
 
-4. **Set up the Database**
+### Database Setup
+
 ```bash
 cd server
 npx prisma migrate dev
 ```
 
-5. **Start the Development Servers**
+### Run the Application
+
+Start the backend:
+
 ```bash
-# Start the backend server
 cd server
 pnpm dev
+```
 
-# Start the frontend application
+In a separate terminal, start the frontend:
+
+```bash
 cd client
 pnpm dev
 ```
 
-## 📁 Project Structure
+The application will be available at:
 
-```
-├── client/                 # Next.js frontend
-│   ├── src/
-│   │   ├── app/           # Next.js app router
-│   │   ├── components/    # React components
-│   │   ├── lib/          # Utilities and configs
-│   │   └── validations/  # Schema validations
-│   └── public/           # Static assets
-│
-├── server/                # Express backend
-│   ├── src/
-│   │   ├── config/       # Configuration files
-│   │   ├── controllers/  # Route controllers
-│   │   ├── middleware/   # Express middleware
-│   │   └── routes/       # API routes
-│   └── prisma/          # Database schema
+```text
+http://localhost:3000
 ```
 
-## 🔒 Security
+## Message Flow
 
-- SSL/TLS encryption for Kafka connections
-- JWT authentication for API routes
-- Google OAuth2.0 integration
-- Secure session management with Redis
-- Input validation and sanitization
+```text
+Client
+  │
+  ▼
+Next.js
+  │
+  ▼
+Express API
+  │
+  ├──────────────► Redis
+  │
+  └──────────────► Kafka
+                       │
+                       ▼
+                 Kafka Consumer
+                       │
+                       ▼
+                  PostgreSQL
+```
 
-## 🔍 Monitoring
+## License
 
-- Socket.IO Admin UI for real-time monitoring
-- Kafka Consumer lag monitoring
-- Redis metrics tracking
-- API endpoint monitoring
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
-
-## 👏 Acknowledgments
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Apache Kafka Documentation](https://kafka.apache.org/documentation/)
-- [Redis Documentation](https://redis.io/docs/)
-- [Socket.IO Documentation](https://socket.io/docs/v4/)
-
-## 📞 Contact
-
-Your Name - [@Nobody_crypto_H](https://x.com/Nobody_crypto_H)
-Project Link: [https://github.com/Harmeet10000/pulsechat](https://github.com/Harmeet10000/pulsechat)
+MIT
